@@ -28,9 +28,10 @@ accounts::add() {
     validators::base32 "$secret" ||
         return "$OATHKEEPER_ERR_INVALID_BASE32"
 
-    <<< "$secret" gpg --symmetric --cipher-algo AES256 \
+    echo "$secret" | gpg --symmetric --cipher-algo AES256 \
         --output "$OATHKEEPER_DIR/$account.gpg" 2> /dev/null ||
         return "$OATHKEEPER_ERR_ENCRYPT_FAILED"
+
     chmod 600 "$OATHKEEPER_DIR/$account.gpg"
 
     loggers::info "Successfully added account: $account"

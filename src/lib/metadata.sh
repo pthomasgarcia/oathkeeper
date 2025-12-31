@@ -2,7 +2,7 @@
 # src/lib/metadata.sh
 
 if [[ -n "${OATHKEEPER_METADATA_LOADED:-}" ]]; then
-    return 0 2>/dev/null
+    return 0 2> /dev/null
 fi
 OATHKEEPER_METADATA_LOADED=true
 
