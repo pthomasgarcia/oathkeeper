@@ -1,0 +1,12 @@
+# UTILITIES
+src/util/loggers.sh
+src/util/validators.sh
+
+# LIBRARIES
+src/lib/metadata.sh
+src/lib/errors.sh
+src/lib/config.sh
+src/lib/ui.sh
+
+# SERVICES
+src/services/accounts.sh

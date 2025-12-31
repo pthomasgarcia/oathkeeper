@@ -1,0 +1,35 @@
+# Environment variables
+.env
+
+# Application state and logs (XDG defaults and legacy)
+logs/
+*.log
+*.env
+*.list
+*.lock
+
+# User specific
+commit_message.txt
+.env
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+test/bats-tmp/
+
+# Local XDG mocks (for development/testing)
+.config/oathkeeper/
+.local/state/oathkeeper/
+
+# Internal project management
+conductor/
+
+# Project documentation to ignore
