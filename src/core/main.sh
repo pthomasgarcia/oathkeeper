@@ -18,6 +18,15 @@ OATHKEEPER_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
 # # CLEANUP: Resource management and cleanup handlers
 # -------------------------------
 cleanup() {
+    # Remove sensitive runtime variables and clean up temporary files.
+    #
+    # Side-effects:
+    #   - Unsets OATHKEEPER_SECRET_IN_MEMORY
+    #   - Deletes paths listed in OATHKEEPER_TEMP_FILES
+    #
+    # Note:
+    #   Registered as EXIT/INT/TERM trap; never call directly.
+
     unset OATHKEEPER_SECRET_IN_MEMORY 2> /dev/null || true
 
     if [ -n "${OATHKEEPER_TEMP_FILES:-}" ]; then
@@ -59,6 +68,11 @@ config::init
 # -------------------------------
 
 main::usage() {
+    # Display concise CLI help message.
+    #
+    # Returns:
+    #   Human-readable usage text on stdout.
+
     cat << EOF
 ${OATHKEEPER_NAME} – ${OATHKEEPER_DESCRIPTION}
 
@@ -72,6 +86,11 @@ EOF
 }
 
 main::version() {
+    # Display program name, version string, and description.
+    #
+    # Returns:
+    #   Single-line version info on stdout.
+
     printf "%s %s\n%s\n" \
         "$OATHKEEPER_NAME" \
         "$OATHKEEPER_VERSION" \
@@ -83,6 +102,15 @@ main::version() {
 # -------------------------------
 
 main::dispatch() {
+    # Route sub-commands to their respective handlers.
+    #
+    # Args:
+    #   cmd (str): First positional argument; determines routing.
+    #   ...    : Remaining arguments passed to the chosen handler.
+    #
+    # Supported commands:
+    #   add, list|-l, version|--version|-v, help|--help|-h, <account>
+
     local cmd=${1:-}
     shift || true
 
@@ -99,13 +127,21 @@ main::dispatch() {
 # ENTRY POINT: Main execution flow
 # -------------------------------
 main() {
-    if [[ $# -lt 1 ]]; then
+    # Entry point: validate dependencies, parse arguments, and execute command.
+    #
+    # Returns:
+    #   0 on success, non-zero on error or missing dependency.
+    #
+    # Side-effects:
+    #   Exits the process on critical failures.
+
+    if [[ $# -eq 0 ]]; then
         main::usage
         loggers::error "No command provided"
         exit 1
     fi
 
-    # Enforce required binaries (policy)
+    # Enforce required binaries
     for cmd in gpg oathtool; do
         command -v "$cmd" > /dev/null 2>&1 || {
             loggers::critical "Required binary missing: $cmd"

@@ -25,8 +25,16 @@ declare -gA _LOG_COLORS=(
     [debug]="${OATHKEEPER_MAGENTA:-}"
 )
 
-# --- Internal: format message for console ---
 loggers::format() {
+    # Internal: colorise and prefix a log line for stderr.
+    #
+    # Args:
+    #   type (str): key into _LOG_COLORS (error|warning|info|debug)
+    #   message (str): literal text to print
+    #
+    # Side-effects:
+    #   Writes to stderr, no colour codes if _LOG_COLORS[type] empty.
+
     local type="$1"
     local message="$2"
 
@@ -35,8 +43,16 @@ loggers::format() {
         "$OATHKEEPER_RESET" "$message" >&2
 }
 
-# --- Internal: log to file + verbose ---
 loggers::log_message() {
+    # Internal: emit timestamped log line to file and/or verbose console.
+    #
+    # Args:
+    #   message (str): raw text to log
+    #   level (str): INFO|WARN|ERROR|CRITICAL|DEBUG
+    #
+    # Side-effects:
+    #   Appends to LOG_FILE if set, prints to stderr if VERBOSE=true.
+
     local message="$1"
     local level="${2:-INFO}"
     local timestamp
@@ -59,26 +75,51 @@ loggers::log_message() {
 # --- Public API ---
 
 loggers::info() {
+    # Log informational message.
+    #
+    # Args:
+    #   message (str): text to display
+
     loggers::format "info" "$1"
     loggers::log_message "$1" "INFO"
 }
 
 loggers::warn() {
+    # Log warning message.
+    #
+    # Args:
+    #   message (str): text to display
+
     loggers::format "warning" "$1"
     loggers::log_message "$1" "WARN"
 }
 
 loggers::error() {
+    # Log error message (non-fatal).
+    #
+    # Args:
+    #   message (str): text to display
+
     loggers::format "error" "$1"
     loggers::log_message "$1" "ERROR"
 }
 
 loggers::critical() {
+    # Log critical error message (fatal context).
+    #
+    # Args:
+    #   message (str): text to display
+
     loggers::format "error" "$1"
     loggers::log_message "$1" "CRITICAL"
 }
 
 loggers::debug() {
+    # Log debug message (no-op unless DEBUG=true).
+    #
+    # Args:
+    #   message (str): text to display
+
     [[ "${DEBUG:-false}" == "true" ]] || return 0
     loggers::format "debug" "$1"
     loggers::log_message "$1" "DEBUG"

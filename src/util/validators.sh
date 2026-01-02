@@ -6,46 +6,59 @@ if [[ -n "${OATHKEEPER_VALIDATORS_LOADED:-}" ]]; then
 fi
 OATHKEEPER_VALIDATORS_LOADED=true
 
-validators::account_name() {
-    # Validate the syntax of an account identifier.
-    #
-    # Rules:
-    #   - non-empty
-    #   - allowed chars: A-Z a-z 0-9 . _ -
-    #   - no leading dot
-    #   - no ".." (directory traversal)
+validators::base32() {
+    # Check whether a string contains only valid Base32 characters.
     #
     # Args:
-    #     name (str): proposed account name
+    #     string  (str): string to test
     #
     # Returns:
-    #     0  valid
-    #     1  invalid
+    #     0  valid Base32 alphabet (A-Z, 2-7, padding =)
+    #     1  otherwise
 
-    local name=$1
-    [[ -n $name ]] || return 1
-    [[ $name =~ ^[A-Za-z0-9._-]+$ ]] || return 1
-    [[ $name != .* ]] || return 1   # forbid leading dot
-    [[ $name != *..* ]] || return 1 # forbid traversal patterns
+    local string=$1
+    if [[ ! $string =~ ^[A-Z2-7=]+$ ]]; then
+        return 1
+    fi
+
     return 0
 }
 
-# -------------------------------
-# Validate Base32 strings
-# -------------------------------
-# Pure: returns 0 if valid, 1 otherwise
-validators::base32() {
-    [[ $1 =~ ^[A-Z2-7=]+$ ]] || return 1
-}
+validators::path_component::is_safe() {
+    # Validate an application-managed pathname component.
+    #
+    # This enforces a restricted filesystem policy suitable for user-supplied
+    # identifiers that will be mapped to files or directories created by
+    # the application.
+    #
+    # Args:
+    #   string (str): user input to verify
+    #
+    # Returns:
+    #   0  safe for use as a pathname component
+    #   1  unsafe
+    #
+    # Note:
+    #   Not suitable for validating arbitrary filesystem paths or existing
+    #   filenames.
 
-# -------------------------------
-# Validate that dependencies exist
-# -------------------------------
-# Pure: returns 0 if all commands exist, 1 otherwise
-validators::dependencies() {
-    local cmd
-    for cmd in gpg oathtool; do
-        command -v "$cmd" > /dev/null 2>&1 || return 1
-    done
+    local string=$1
+
+    if [[ -z $string ]]; then
+        return 1
+    fi
+
+    if [[ ! $string =~ ^[A-Za-z0-9._-]+$ ]]; then
+        return 1
+    fi
+
+    if [[ $string == .* ]]; then
+        return 1
+    fi
+
+    if [[ $string == *..* ]]; then
+        return 1
+    fi
+
     return 0
 }

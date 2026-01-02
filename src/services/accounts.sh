@@ -79,7 +79,9 @@ accounts::secret::read() {
     # Example:
     #     secret=$(accounts::secret::read "" "github")
 
-    local secret=$1 account=$2
+    local secret=$1
+    local account=$2
+
     if [[ $secret == "-" ]]; then
         secret=$(cat)
     elif [[ -z $secret ]]; then
@@ -182,7 +184,7 @@ accounts::add() {
     local account="${1:-}"
     local secret="${2:-}"
 
-    validators::account_name "$account" ||
+    validators::path_component::is_safe "$account" ||
         return "$OATHKEEPER_ERR_INVALID_ACCOUNT_NAME"
     mkdir -p "$OATHKEEPER_DIR" ||
         return "$OATHKEEPER_ERR_ACCOUNT_DIR_CREATION_FAILED"
@@ -238,7 +240,7 @@ accounts::otp::generate() {
     #     Appropriate $OATHKEEPER_ERR_* code on any failure.
 
     local account="$1"
-    validators::account_name "$account" ||
+    validators::path_component::is_safe "$account" ||
         return "$OATHKEEPER_ERR_INVALID_ACCOUNT_NAME"
 
     local secret

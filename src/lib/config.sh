@@ -9,8 +9,26 @@ if [[ -n "${OATHKEEPER_CONFIG_LOADED:-}" ]]; then
 fi
 OATHKEEPER_CONFIG_LOADED=true
 
-# Initialize Oathkeeper configuration
 config::init() {
+    # Load user configuration and apply safe defaults.
+    #
+    # Config file searched (in order):
+    #   - $OATHKEEPER_CONFIG if set
+    #   - $HOME/.config/oathkeeper/config otherwise
+    #
+    # Sets readonly globals:
+    #   OATHKEEPER_DIR      – storage directory for encrypted secrets
+    #   OATHKEEPER_PINENTRY – pinentry program for GPG passphrase prompts
+    #   OATHKEEPER_GPG_TTY  – TTY to attach gpg-agent to
+    #
+    # Side-effects:
+    #   - Sources config file if present
+    #   - Exports OATHKEEPER_GPG_TTY
+    #   - Sets umask 077 for restrictive file creation
+    #
+    # Returns:
+    #   0 always
+
     local file="${OATHKEEPER_CONFIG:-$HOME/.config/oathkeeper/config}"
 
     # Load user configuration if it exists

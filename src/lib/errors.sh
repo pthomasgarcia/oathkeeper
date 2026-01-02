@@ -29,6 +29,15 @@ declare -A OATHKEEPER_ERROR_MESSAGES=(
 )
 
 errors::message() {
+    # Map an error code to its human-readable description.
+    #
+    # Args:
+    #     code (int): Numeric error code defined in OATHKEEPER_ERROR_MESSAGES.
+    #
+    # Returns:
+    #     Descriptive string on stdout.
+    #     "Unknown error code: <code>" if the code is not registered.
+
     local code=$1
     if [[ -n "${OATHKEEPER_ERROR_MESSAGES[$code]:-}" ]]; then
         echo "${OATHKEEPER_ERROR_MESSAGES[$code]}"
