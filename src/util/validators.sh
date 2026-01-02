@@ -6,11 +6,22 @@ if [[ -n "${OATHKEEPER_VALIDATORS_LOADED:-}" ]]; then
 fi
 OATHKEEPER_VALIDATORS_LOADED=true
 
-# -------------------------------
-# Validate account names
-# -------------------------------
-# Non-empty, only safe characters, no leading dot, no ".." sequences
 validators::account_name() {
+    # Validate the syntax of an account identifier.
+    #
+    # Rules:
+    #   - non-empty
+    #   - allowed chars: A-Z a-z 0-9 . _ -
+    #   - no leading dot
+    #   - no ".." (directory traversal)
+    #
+    # Args:
+    #     name (str): proposed account name
+    #
+    # Returns:
+    #     0  valid
+    #     1  invalid
+
     local name=$1
     [[ -n $name ]] || return 1
     [[ $name =~ ^[A-Za-z0-9._-]+$ ]] || return 1

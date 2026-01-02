@@ -1,6 +1,6 @@
-# Oathkeeper
+# oathkeeper
 
-**Oathkeeper** is a secure, command-line based OTP (One-Time Password) manager written in Bash. It leverages GPG for secure storage of secrets and `oathtool` for generating standard TOTP codes.
+**oathkeeper** is a secure, command-line based OTP (One-Time Password) manager written in Bash. It leverages GPG for secure storage of secrets and `oathtool` for generating standard TOTP codes.
 
 ## Features
 
@@ -64,7 +64,7 @@ oathkeeper list
 
 ## Configuration
 
-Oathkeeper uses a configuration file located at `~/.config/oathkeeper/config` (or defined by `$OATHKEEPER_CONFIG`).
+oathkeeper uses a configuration file located at `~/.config/oathkeeper/config` (or defined by `$OATHKEEPER_CONFIG`).
 
 Default settings:
 *   **Storage Directory:** `~/.oathkeeper`

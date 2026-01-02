@@ -91,7 +91,7 @@ main::dispatch() {
         list | -l) accounts::list ;;
         version | --version | -v) main::version ;;
         help | --help | -h) main::usage ;;
-        *) accounts::generate "$cmd" ;;
+        *) accounts::otp::generate "$cmd" ;;
     esac
 }
 
@@ -105,11 +105,13 @@ main() {
         exit 1
     fi
 
-    # Ensure dependencies exist
-    if ! validators::dependencies; then
-        loggers::critical "Required binaries missing: gpg or oathtool"
-        exit 1
-    fi
+    # Enforce required binaries (policy)
+    for cmd in gpg oathtool; do
+        command -v "$cmd" > /dev/null 2>&1 || {
+            loggers::critical "Required binary missing: $cmd"
+            exit 1
+        }
+    done
 
     main::dispatch "$@"
 }
